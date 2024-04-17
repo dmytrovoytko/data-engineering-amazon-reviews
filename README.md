@@ -58,6 +58,7 @@ Combination of CodeSpaces + PostgreSQL + Metabase + Mage AI would be a good choi
 - [Ingest data using CLI (bash & python)](#keyboard-ingest-data-using-cli-bash--python)
 - [Visualize data](#-visualize-data)
 - [Orchestration data ingestion (Mage AI)](#mage-orchestrate-data-ingestion-mage-ai)
+- [Instructions to stop the apps](#stop_button-instructions-to-stop-the-apps)
 
 ### :hammer_and_wrench: Setup environment
 
@@ -158,6 +159,7 @@ New page would probably open white. Please wait a couple of seconds to let it st
 ### :mage: Orchestrate data ingestion (Mage AI)
 
 I wouldn't say it was so simple and easy as Matt showed us in videos, but with some time and effort I managed to find the way to convert the logic of my `jsonl_postgres.py` script into `Mage` pipelines and bricks. Why is it worth my/your time? Because larger datasets (like Kindle_Store) will probably demand a serious cloud storage, database and compute than free CodeSpace playground. And I (you?) need to learn how to deal with them with a more scalable system, providing long job execution, partitioning, monitoring and logs. So let's see 2 pipelines I managed to setup with Mage. 
+
 💡 In case something goes wrong or complicated, you can still ingest more datasets with step 11 [Ingest data using CLI (bash & python)](#keyboard-ingest-data-using-cli-bash--python) and then reload Metabase dashboard page.
 
 18. Run `unzip mage.zip` to extract pre-configured Mage AI workflow.
@@ -194,7 +196,7 @@ You will see 2 pipelines I configured:
 
 ![Mage AI pipeline run variable](/screenshots/mage-run-pipeline-variable.png)
 
-Enter `dataset_urls1.csv` and click `Run now` button. Ingestion process started. Yuu can see the progress on `Pipeline runs` page.
+Enter `dataset_urls2.csv` (that you downloaded but not processed yet) and click `Run now` button. Ingestion process started. You can see the progress on `Pipeline runs` page.
 
 25. After ingesting new dataset you can switch to Metabase page, update it and see new data in the dashboard reports. Congratulations!✅
 
@@ -207,3 +209,12 @@ docker stop $(docker ps -a -q)
 ```
 - Stop Mage - switch to 2nd terminal and press `Ctrl-C`
 - Stop PostgreSQL - switch to 1st terminal and press `Ctrl-C`
+
+## Thank you for your time!
+
+- If you experience any issue while following this instruction or any unclear steps, please add it to [Issues](https://github.com/dmytrovoytko/data-engineering-amazon-reviews/issues), I'll be glad to help/fix. And your feedback, questions & suggestions are welcome as well!
+- Feel free to fork and submit pull requests.
+
+If you find this project helpful, please ⭐️star⭐️ my repo https://github.com/dmytrovoytko/data-engineering-amazon-reviews to help other people discover it 🙏
+
+Made with ❤️ in Ukraine 🇺🇦 Dmytro Voytko
