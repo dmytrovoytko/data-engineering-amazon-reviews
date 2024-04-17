@@ -13,8 +13,27 @@ It would be a good choice for those who prefer/experiment with a simple and open
 
 ## 🎯 Goals
 
+This is my Data Engineering project started during [DE ZoomCamp](https://github.com/DataTalksClub/data-engineering-zoomcamp)'24.
+I chose to analyze Amazon Reviews dataset. Full dataset is huge, and it is available to download in parts - by product categories. There are some smaller and larger dataset, some of them we would explore here (Digital_Music, Health_and_Personal_Care, All_Beauty, Software). Each subset includes 2 parts: products (meta), ratings and user comments (reviews).
+
+Some time ago I became very interested in how much we can trust all those ratings on Amazon, including 'bestseller' statuses. But without data it was hard to investigate. Now, years later, I have more skills in data analytics and thanks to [McAuley Lab](https://cseweb.ucsd.edu/~jmcauley/) this huge dataset. I chose to use only part of the whole information: 
+- Products: categories and average ratings 
+- Reviews: user's ratings, comments, review dates, was that verified purchase or not
+
+### 🕵️ Questions that I chose to investigate:
+
+- What are the trends in reviews ratings for verified/not purchases? Are they more negative or more positive than average?
+- As not verified purchase reviews can be manipulative, what are their ratio in total number?
+- As automated review submission is technically possible with more advanced tech last years, what are the rating trends over time?
+- Are there any significant differences in trends for product categories?
+
+Let's explore together! These categories (datasets) I played with so far.
+
 ![Reviews by Main category](/screenshots/pie-chart-reviews-by-main-category.png)
 
+## Assets
+
+- dataset urls are defined in .csv files stored in /data directory - dataset_urls0.csv, dataset_urls1.csv, etc
 
 ## 🚀 Instructions to deploy and test
 
