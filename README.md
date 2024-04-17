@@ -4,6 +4,8 @@ Data Engineering project for ZoomCamp`24: JSONL -> PostgreSQL + Metabase + Mage.
 
 ETL for [Amazon Reviews'23` dataset](https://amazon-reviews-2023.github.io/).
 
+![Data Engineering project Amazon Reviews](/screenshots/amazon-reviews-data-engineering.png)
+
 Cloud Environment: **GitHub CodeSpaces**, free and enough to test: Compute resources - 120 core-hours of Codespaces compute for free monthly, Datastore - 15GB of Codespaces storage for free monthly. 
 
 To reproduce and review this project it would be enough (hopefully) less than hour, and ~2GB total for smaller datasets. You don't need to use anything extra, like VS Code - just webrowser + GitHub account is totally enough.
@@ -14,13 +16,16 @@ It would be a good choice for those who prefer/experiment with a simple and open
 ## 🎯 Goals
 
 This is my Data Engineering project started during [DE ZoomCamp](https://github.com/DataTalksClub/data-engineering-zoomcamp)'24.
-I chose to analyze Amazon Reviews dataset. Full dataset is huge, and it is available to download in parts - by product categories. There are some smaller and larger dataset, some of them we would explore here (Digital_Music, Health_and_Personal_Care, All_Beauty, Software). Each subset includes 2 parts: products (meta), ratings and user comments (reviews).
+I chose to analyze [Amazon Reviews](https://amazon-reviews-2023.github.io/) dataset. Full dataset is huge, and it is available to download in parts - by product categories. There are some smaller and larger dataset, some of them we would explore here (Digital_Music, Health_and_Personal_Care, All_Beauty, Software). Each subset includes 2 parts: products (**meta**), ratings and user comments (**reviews**).
 
-Some time ago I became very interested in how much we can trust all those ratings on Amazon, including 'bestseller' statuses. But without data it was hard to investigate. Now, years later, I have more skills in data analytics and thanks to [McAuley Lab](https://cseweb.ucsd.edu/~jmcauley/) this huge dataset. I chose to use only part of the whole information: 
+Some time ago I became very interested in how much we can trust all those ratings on Amazon, including 'bestseller' statuses. But without data it was hard to investigate. Now, years later, I have more skills in data analytics and this huge dataset, thanks to [McAuley Lab](https://cseweb.ucsd.edu/~jmcauley/). I chose to use only part of the whole information: 
 - Products: categories and average ratings 
-- Reviews: user's ratings, comments, review dates, was that verified purchase or not
+- Reviews: user's ratings, review dates, was that verified purchase or not 
+  (will analyze reviews texts later, the source for many insights I think)
 
-### 🕵️ Questions that I chose to investigate:
+Thanks to ZoomCamp for the reason to learn many new tools and get back to those 'reviews & trust' questions!  
+
+### 🕵️ Questions that I chose to investigate during this project:
 
 - What are the trends in reviews ratings for verified/not purchases? Are they more negative or more positive than average?
 - As not verified purchase reviews can be manipulative, what are their ratio in total number?
