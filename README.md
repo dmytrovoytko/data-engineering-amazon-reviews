@@ -36,7 +36,7 @@ Let's explore together! These categories (datasets) I played with so far.
 
 ![Reviews by Main category](/screenshots/pie-chart-reviews-by-main-category.png)
 
-## Assets
+## ℹ️ Assets
 
 - dataset urls are defined in .csv files stored in /data directory - dataset_urls0.csv, dataset_urls1.csv, etc
 
@@ -44,7 +44,13 @@ Let's explore together! These categories (datasets) I played with so far.
 
 💡 Oh, so many steps?! Please don't panic, they are all simple enough, that's why so many. One step at a time. I did it, you can do it too! Let's go!
 
-### 🛠️🧰 Setup environment
+- [Setup environment](#-setup-environment)
+- [Download dataset and start PostgreSQL server](#-sownload-dataset-and-start-postgresql-server)
+- [Ingest data using CLI (bash & python)](#-ingest-data-using-cli--bash--python)
+- [Visualize data](#-visualize-data)
+- [Data ingestion orchestration (Mage AI)](#-data-ingestion-orchestration--mage-ai)
+
+### 🛠️ Setup environment
 
 1. Fork this repo in GitHub.
 2. Create GitHub CodeSpace from the repo.
@@ -54,7 +60,7 @@ Let's explore together! These categories (datasets) I played with so far.
 cp dev.env .env
 ```
 
-### ⬇️🗂 Download dataset and start PostgreSQL server
+### ⤵️ Download dataset and start PostgreSQL server
 
 5. Run `bash download.sh` to download 1st dataset (smallest) - from `dataset_urls0.csv`. As a result you will have 2 files in your `data` directory: `meta_Digital_Music.jsonl.gz` and `meta_Digital_Music.jsonl.gz`. Cool!✅
 ```bash
@@ -72,7 +78,7 @@ bash start_postgres.sh
 pgcli -h 172.17.0.2 -p 5432 -u postg -d amzn_reviews
 ```
 
-### ➡️📦️ Ingest data using CLI (bash & python)
+### 📦️ Ingest data using CLI (bash & python)
 
 10. Run `bash process.sh` to ingest dataset files into PostgreSQL database. 
 ```bash
@@ -115,7 +121,7 @@ It will automatically download Metabase container and start it.
 - pie chart with Reviews number by Main category
 - Reviews rating number distribution by Main category over time (by months)  
 
-17. The more datasets you load, the more categories you can see. So I offer you to download and process at least 2 datasets. You can do it by following steps in [Ingest data using CLI (bash & python)](%EF%B8%8F%EF%B8%8F-ingest-data-using-cli-bash--python) or go ahead and discover [Mage AI](#%EF%B8%8F-data-ingestion-orchestration-mage-ai).
+17. The more datasets you load, the more categories you can see. So I offer you to download and process at least 2 datasets. You can do it by following steps in [Ingest data using CLI (bash & python)](#-ingest-data-using-cli-bash--python) or go ahead and discover [Mage AI](#-data-ingestion-orchestration-mage-ai).
 
 ### 🧙‍♀️ Data ingestion orchestration (Mage AI)
 
