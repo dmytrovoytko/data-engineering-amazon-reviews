@@ -10,12 +10,13 @@ Cloud Environment: **GitHub CodeSpaces**, free and enough to test: Compute resou
 
 To reproduce and review this project it would be enough (hopefully) less than hour, and ~2GB total for smaller datasets. You don't need to use anything extra, like VS Code - just webrowser + GitHub account is totally enough.
 
-This level of cloud resources allowed me to process and analyze-visualize datasets with ~6mln reviews.
-It would be a good choice for those who prefer/experiment with a simple and open source approach, or those who hesitate to deal with The BIG 3 cloud providers (AWS, Azure, GCP) with their serious payments. Looks like a good fit for startups on early stages, developers, and those who learn Data Engineering, as me (you?).     
+This level of cloud resources allowed me to process and analyze-visualize datasets with at least ~6mln reviews.
 
 ## 🎯 Goals
 
 This is my Data Engineering project started during [DE ZoomCamp](https://github.com/DataTalksClub/data-engineering-zoomcamp)'24.
+And **the main goal** is straight-forward: **Extract - Transform - Load** data, then **visualize** some insights.  
+
 I chose to analyze [Amazon Reviews](https://amazon-reviews-2023.github.io/) dataset. Full dataset is huge, and it is available to download in parts - by product categories. There are some smaller and larger dataset, some of them we would explore here (Digital_Music, Health_and_Personal_Care, All_Beauty, Software). Each subset includes 2 parts: products (**meta**), ratings and user comments (**reviews**).
 
 Some time ago I became very interested in how much we can trust all those ratings on Amazon, including 'bestseller' statuses. But without data it was hard to investigate. Now, years later, I have more skills in data analytics and this huge dataset, thanks to [McAuley Lab](https://cseweb.ucsd.edu/~jmcauley/). I chose to use only part of the whole information: 
@@ -39,6 +40,14 @@ Let's explore together! These categories (datasets) I played with so far.
 ## ℹ️ Assets
 
 - dataset urls are defined in .csv files stored in /data directory - dataset_urls0.csv, dataset_urls1.csv, etc
+
+## :toolbox: Tech stack
+
+- PostgreSQL as a data base/warehouse - open source and free
+- [Metabase](https://www.metabase.com/) as an analitics platform - open source and free self-hosted
+- [Mage AI](https://www.mage.ai/) as an orchestration tool - open source and free self-hosted
+
+Combination of CodeSpaces + PostgreSQL + Metabase + Mage AI would be a good choice for those who prefer/experiment with a simple and open source approach, or those who hesitate to deal with The BIG 3 cloud providers (AWS, Azure, GCP) with their serious payments. Looks like a good fit for early stage startups, developers, and those who learn Data Engineering as me (you?).  
 
 ## 🚀 Instructions to deploy and test
 
