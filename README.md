@@ -50,7 +50,7 @@ Let's explore together! These categories (datasets) I played with so far.
 - [Visualize data](#-visualize-data)
 - [Data ingestion orchestration (Mage AI)](#-data-ingestion-orchestration--mage-ai)
 
-### 🛠️ Setup environment
+### :hammer_and_wrench: Setup environment
 
 1. Fork this repo in GitHub.
 2. Create GitHub CodeSpace from the repo.
