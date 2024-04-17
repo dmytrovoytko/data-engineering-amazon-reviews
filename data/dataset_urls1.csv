@@ -1,0 +1,3 @@
+table_name,file_name,url
+meta,meta_Health_and_Personal_Care.jsonl.gz,https://datarepo.eng.ucsd.edu/mcauley_group/data/amazon_2023/raw/meta_categories/meta_Health_and_Personal_Care.jsonl.gz
+reviews,Health_and_Personal_Care.jsonl.gz,https://datarepo.eng.ucsd.edu/mcauley_group/data/amazon_2023/raw/review_categories/Health_and_Personal_Care.jsonl.gz

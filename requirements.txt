@@ -1,0 +1,5 @@
+pandas==2.2.1
+pgcli==4.0.1
+SQLAlchemy==2.0.28
+psycopg2-binary==2.9.9
+dask[complete]

@@ -1,0 +1,3 @@
+table_name,file_name,url
+meta,meta_Software.jsonl.gz,https://datarepo.eng.ucsd.edu/mcauley_group/data/amazon_2023/raw/meta_categories/meta_Software.jsonl.gz
+reviews,Software.jsonl.gz,https://datarepo.eng.ucsd.edu/mcauley_group/data/amazon_2023/raw/review_categories/Software.jsonl.gz
