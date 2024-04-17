@@ -2,8 +2,14 @@
 
 Data Engineering project for ZoomCamp`24: JSONL -> PostgreSQL + Metabase + Mage.AI
 
-ETL for `Amazon Reviews'23` dataset. Source: https://amazon-reviews-2023.github.io/ 
-Cloud Environment: GitHub CodeSpaces, free and enough to test.
+ETL for [Amazon Reviews'23` dataset](https://amazon-reviews-2023.github.io/).
+
+Cloud Environment: **GitHub CodeSpaces**, free and enough to test: Compute resources - 120 core-hours of Codespaces compute for free monthly, Datastore - 15GB of Codespaces storage for free monthly. 
+
+To reproduce and review this project it would be enough (hopefully) less than hour, and ~2GB total for smaller datasets. You don't need to use anything extra, like VS Code - just webrowser + GitHub account is totally enough.
+
+This level of cloud resources allowed me to process and analyze-visualize datasets with ~6mln reviews.
+It would be a good choice for those who prefer/experiment with a simple and open source approach, or those who hesitate to deal with The BIG 3 cloud providers (AWS, Azure, GCP) with their serious payments. Looks like a good fit for startups on early stages, developers, and those who learn Data Engineering, as me (you?).     
 
 ## 🎯 Goals
 
@@ -18,7 +24,7 @@ Cloud Environment: GitHub CodeSpaces, free and enough to test.
 
 1. Fork this repo in GitHub.
 2. Create GitHub CodeSpace from the repo.
-3. Start CodeSpace, wait for `requirements.txt` installation finish (starts automatically, just watch & wait).
+3. **Start CodeSpace**, wait for `requirements.txt` installation to finish (it starts automatically, just watch & wait).
 4. Copy `dev.env` to `.env` - run `cp dev.env .env` in your CodeSpace terminal. You don't need to change anything to test the process. It contains **all key settings** (PostgreSQL etc).
 ```bash
 cp dev.env .env
@@ -34,7 +40,7 @@ bash download.sh
 ```bash
 bash start_postgres.sh
 ```
-7. Wait until you see the message `database system is ready to accept connections` - PostgreSQL is ready to serve you. Let it run in this terminal so you can see logs and easily stop it later.
+7. Wait until you see the message `database system is ready to accept connections` - PostgreSQL is ready to serve you. Let it run in this terminal so you can see logs and easily stop it later (with just Ctrl-C).
 
 8. Start 2nd terminal (click `+` button on the panel in the right corner above terminal) and switch to it. 
 9. You can check database connection by running `pgcli -h 172.17.0.2 -p 5432 -u postg -d amzn_reviews`, password `postg`. All dockerized apps of this setup are suppose to run in default `bridge` network, `172.17.0.x`, with `172.17.0.2` for PostgreSQL. If this step fails you're in trouble 😅 But, when you run it in a CodeSpace and follow the instruction it should work fine, I tested multiple times. Type `quit` to return to terminal CLI. Ok, PostgreSQL is running.✅
@@ -85,7 +91,7 @@ It will automatically download Metabase container and start it.
 - pie chart with Reviews number by Main category
 - Reviews rating number distribution by Main category over time (by months)  
 
-17. The more datasets you load, the more categories you can see. So I offer you to download and process at least 2 datasets. You can do it by following steps in [Ingest data using CLI (bash & python)](#ingest-data-using-cli-bash--python) or go ahead and discover [Mage AI](#data-ingestion-orchestration-mage-ai).
+17. The more datasets you load, the more categories you can see. So I offer you to download and process at least 2 datasets. You can do it by following steps in [Ingest data using CLI (bash & python)](%EF%B8%8F%EF%B8%8F-ingest-data-using-cli-bash--python) or go ahead and discover [Mage AI](#%EF%B8%8F-data-ingestion-orchestration-mage-ai).
 
 ### 🧙‍♀️ Data ingestion orchestration (Mage AI)
 
