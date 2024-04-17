@@ -44,11 +44,11 @@ Let's explore together! These categories (datasets) I played with so far.
 
 💡 Oh, so many steps?! Please don't panic, they are all simple enough, that's why so many. One step at a time. I did it, you can do it too! Let's go!
 
-- [Setup environment](#-setup-environment)
-- [Download dataset and start PostgreSQL server](#-sownload-dataset-and-start-postgresql-server)
-- [Ingest data using CLI (bash & python)](#-ingest-data-using-cli--bash--python)
+- [Setup environment](#hammer_and_wrench-setup-environment)
+- [Download dataset and start PostgreSQL server](#arrow_heading_down-download-dataset-and-start-postgresql-server)
+- [Ingest data using CLI (bash & python)](#keyboard-ingest-data-using-cli-bash--python)
 - [Visualize data](#-visualize-data)
-- [Data ingestion orchestration (Mage AI)](#-data-ingestion-orchestration--mage-ai)
+- [Data ingestion orchestration (Mage AI)](#mage-data-ingestion-orchestration-mage-ai)
 
 ### :hammer_and_wrench: Setup environment
 
@@ -60,7 +60,7 @@ Let's explore together! These categories (datasets) I played with so far.
 cp dev.env .env
 ```
 
-### ⤵️ Download dataset and start PostgreSQL server
+### :arrow_heading_down: Download dataset and start PostgreSQL server
 
 5. Run `bash download.sh` to download 1st dataset (smallest) - from `dataset_urls0.csv`. As a result you will have 2 files in your `data` directory: `meta_Digital_Music.jsonl.gz` and `meta_Digital_Music.jsonl.gz`. Cool!✅
 ```bash
@@ -78,7 +78,7 @@ bash start_postgres.sh
 pgcli -h 172.17.0.2 -p 5432 -u postg -d amzn_reviews
 ```
 
-### 📦️ Ingest data using CLI (bash & python)
+### :keyboard: Ingest data using CLI (bash & python)
 
 10. Run `bash process.sh` to ingest dataset files into PostgreSQL database. 
 ```bash
@@ -121,12 +121,25 @@ It will automatically download Metabase container and start it.
 - pie chart with Reviews number by Main category
 - Reviews rating number distribution by Main category over time (by months)  
 
-17. The more datasets you load, the more categories you can see. So I offer you to download and process at least 2 datasets. You can do it by following steps in [Ingest data using CLI (bash & python)](#-ingest-data-using-cli-bash--python) or go ahead and discover [Mage AI](#-data-ingestion-orchestration-mage-ai).
+17. The more datasets you load, the more categories you can see. So I offer you to download and process at least 2 datasets. You can do it by following steps in [Ingest data using CLI (bash & python)](#keyboard-ingest-data-using-cli-bash--python) or go ahead and discover [Mage AI](#mage-data-ingestion-orchestration-mage-ai).
 
-### 🧙‍♀️ Data ingestion orchestration (Mage AI)
+### :mage: Data ingestion orchestration (Mage AI)
 
 I wouldn't say it was so simple and easy as Matt showed us in videos, but with some time and effort I managed to find the way to convert the logic of `jsonl_postgres.py` script into Mage pipelines and bricks. Why it worth time? Because larger datasets (like Kindle_Store) will probably demand a serious cloud storage and database than free CodeSpace playground. And I (you?) need to learn how to deal with them with a more scalable system, providing long job execution, partitioning, monitoring and logs. So let's see 2 pipelines I managed to setup with Mage. 
 
-18. 
+18. Start 3nd terminal (click `+` button on the panel in the right corner above terminal) and switch to it. Run `unzip mage.zip` to extract pre-configured Mage AI workflow.
+```bash
+unzip mage.zip
+```
+19. Run `docker-compose build` to automatically download and prepare Docker container with Mage AI.
+```bash
+docker-compose build
+```
+20. Run `docker-compose up` to start Docker container with Mage AI.
+```bash
+docker-compose up
+```
+21. CodeSpace will pop-up the notification that `Your application running on port 6789 is available.` - click `Open in Browser`. New page would probably open white. Please wait a couple of seconds to let Mage AI start, then refresh the page. Now you will see Mage dashboard. Your orchestration center is ready to serve you!✅
+![Open Mage AI page](/screenshots/open-mage-ai-page.png)
 
-
+22. Go to `Pipelines`.
