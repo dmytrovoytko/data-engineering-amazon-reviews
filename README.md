@@ -86,7 +86,7 @@ bash process.sh
 ```
 It executes python script `jsonl_postgres.py` with default parameters from your `.env` settings. By default (without parameter) it processes 1st dataset files. As the result of successful loading you will see some progress messages and finally `Finished ingesting data/... into the PostgreSQL database! Total time ... second(s) +++ PROCESSING finished: OK!`. Congratulations, the first approach to load data accomplished and you have records in 2 tables of your database: `meta` with products, `reviews` with ratings.✅ 
 
-11. If you don't want (or have no time) to play with Mage.AI orchestration, you can ingest few more datasets with the same approach: 
+11. If you want to try data workflow orchestration have some patience and follow to [Visualize data](#-visualize-data) step. If you don't want (or have no time) to play with Mage.AI, you can ingest few more datasets with the same approach: 
 - download 2nd dataset: run `bash download.sh dataset_urls1.csv` (Health_and_Personal_Care.jsonl files)
 ```bash
 bash download.sh dataset_urls1.csv
@@ -126,6 +126,7 @@ It will automatically download Metabase container and start it.
 ### :mage: Data ingestion orchestration (Mage AI)
 
 I wouldn't say it was so simple and easy as Matt showed us in videos, but with some time and effort I managed to find the way to convert the logic of `jsonl_postgres.py` script into Mage pipelines and bricks. Why it worth time? Because larger datasets (like Kindle_Store) will probably demand a serious cloud storage and database than free CodeSpace playground. And I (you?) need to learn how to deal with them with a more scalable system, providing long job execution, partitioning, monitoring and logs. So let's see 2 pipelines I managed to setup with Mage. 
+💡 In case something go wrong or complicated, you can still ingest more datasets with step 11 [Ingest data using CLI (bash & python)](#keyboard-ingest-data-using-cli-bash--python) and then update Metabase dashboard.
 
 18. Start 3nd terminal (click `+` button on the panel in the right corner above terminal) and switch to it. Run `unzip mage.zip` to extract pre-configured Mage AI workflow.
 ```bash
@@ -140,6 +141,7 @@ docker-compose build
 docker-compose up
 ```
 21. CodeSpace will pop-up the notification that `Your application running on port 6789 is available.` - click `Open in Browser`. New page would probably open white. Please wait a couple of seconds to let Mage AI start, then refresh the page. Now you will see Mage dashboard. Your orchestration center is ready to serve you!✅
+
 ![Open Mage AI page](/screenshots/open-mage-ai-page.png)
 
 22. Go to `Pipelines`.
