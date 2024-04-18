@@ -216,6 +216,24 @@ Enter `dataset_urls2.csv` (that you downloaded but not processed yet) and click 
 
 26. If you get to this point, please ⭐️star⭐️ my repo! 🙌
 
+## :gift: One more open source opportunity
+
+Bonus for those who survived reading instructions! 
+
+In addition to using PostgreSQL in docker (local on your computer or as described in GitHub CodeSpace) you can use/experiment with Supabase - an open source Firebase alternative.
+
+It provides a quite generous free plan (not a trial, no credit card required): 500 MB database space, 2 Core shared CPU, 1GB RAM, 5 GB bandwidth, 1 GB file storage. Free projects are paused after 1 week of inactivity. Limit of 2 active projects.
+
+I tested it, it works with my scripts. You just need to 
+- register free account 
+- get access credentials (host, port, user, password, database)
+- put new values to `.env` file 
+- create in Supabase 2 tables - `meta` and `reviews`, then define structure (according to my python script)
+- and finally use my `process.sh` (or Mage AI pipelines) to ingest data there
+- Metabase works with Supabase as with any PostgreSQL database - create dashboard for your new database.
+  
+Let me [know](/issues) how it worked for you!  
+
 ## :stop_button: Instructions to stop the apps
 
 - Simple way - stop all together by stopping your CodeSpace. Remember, this will leave all downloaded data in your CodeSpace - you can start it later and continue playing with tools and data. You can also delete CodeSpace with all the data.
@@ -230,7 +248,7 @@ docker stop $(docker ps -a -q)
 
 🙏 Thank you for your attention and time!
 
-- If you experience any issue while following this instruction (or something left unclear), please add it to [Issues](https://github.com/dmytrovoytko/data-engineering-amazon-reviews/issues), I'll be glad to help/fix. And your feedback, questions & suggestions are welcome as well!
+- If you experience any issue while following this instruction (or something left unclear), please add it to [Issues](/issues), I'll be glad to help/fix. And your feedback, questions & suggestions are welcome as well!
 - Feel free to fork and submit pull requests.
 
 If you find this project helpful, please ⭐️star⭐️ my repo https://github.com/dmytrovoytko/data-engineering-amazon-reviews to help other people discover it 🙏
