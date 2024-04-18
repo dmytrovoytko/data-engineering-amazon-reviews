@@ -171,6 +171,10 @@ def main(params):
         if table_name=='meta': # products file
             # replacing rating_number = null with 0, then fixing wrong dtype (float because of nulls)
             try:
+                df_repl = df[df['average_rating'].isnull()]
+                if df_repl.shape[0]:
+                    print(f'Replacing null in average_rating -> 3: {df_repl.shape[0]} record(s)')
+                    df.loc[chunk['average_rating'].isnull(), 'average_rating'] = 3
                 df_repl = df[df['rating_number'].isnull()]
                 if df_repl.shape[0]:
                     print(f'Replacing null in rating_number -> 0: {df_repl.shape[0]} record(s)')
@@ -252,7 +256,7 @@ def main(params):
         except Exception as e:
             print('Appending chunk {i} to PostgreSQL table failed. Ingestion stopped.\n',e)
             print(df.head())
-            return
+            return 1
 
         t_end = time()
         print(f'... chunk {i:02d} appended, {df.shape[0]} record(s), took {(t_end - t_start):.3f} second(s)')
@@ -274,4 +278,5 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    main(args)
+    res = main(args)
+    exit(res)
