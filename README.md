@@ -46,12 +46,12 @@ Let's explore together! These categories (datasets) I played with so far.
 
 ## :toolbox: Tech stack
 
-- Docker and docker-compose
+- Docker and docker-compose. All dockerized apps use default bridge network (172.17.0.x). 
 - PostgreSQL as a data base/warehouse - open source and free
 - [Metabase](https://www.metabase.com/) as an analitics platform - open source and free self-hosted
 - [Mage AI](https://www.mage.ai/) as an orchestration tool - open source and free self-hosted
 
-💡 Combination of CodeSpaces + PostgreSQL + Metabase + Mage AI would be a good choice for those who prefer/experiment with a simple and open source approach, or those who hesitate to deal with The BIG 3 cloud providers (AWS, Azure, GCP) with their serious payments. Looks like a good fit for early stage startups, developers, and those who learn Data Engineering as me (you?).  
+💡 Combination of CodeSpaces + PostgreSQL + Metabase + Mage AI would be a good choice for those who prefer/experiment with a simple and open source approach, or those who hesitate to deal with The BIG 3 cloud providers (AWS, Azure, GCP) with their serious payments. Looks like a good fit for early stage startups, developers, and those who learn Data Engineering as me (you?). ❕Find one more open source and free opportunity at the end of this instructiom.
 
 ## 🚀 Instructions to deploy
 
@@ -247,6 +247,7 @@ docker stop $(docker ps -a -q)
 	- switch to 2nd terminal and press `Ctrl-C`
 	- then run `docker-compose down` in terminal
 * Stop PostgreSQL - switch to 1st terminal and press `Ctrl-C`
+* You can delete downloaded dataset .jsonl.gz files from `/data` folder. 
 
 ## Support
 
