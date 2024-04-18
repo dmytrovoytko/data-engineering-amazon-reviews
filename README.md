@@ -8,7 +8,7 @@ ETL for [Amazon Reviews'23` dataset](https://amazon-reviews-2023.github.io/).
 
 Cloud environment: **GitHub CodeSpaces**, free and enough to test (120 core-hours of Codespaces compute for free monthly, 15GB of Codespaces storage for free monthly). 
 
-To reproduce and review this project it would be enough (hopefully) less than hour, and ~2GB total for described datasets. You don't need to use anything extra, like VS Code or trial accounts - just webrowser + GitHub account is totally enough.
+To reproduce and review this project it would be enough (hopefully) less than hour, and ~8GB total for described datasets. You don't need to use anything extra, like VS Code or trial accounts - just webrowser + GitHub account is totally enough.
 
 This level of cloud resources allowed me to process and analyze-visualize datasets with at least 6 Mln reviews without issues.
 
@@ -243,8 +243,10 @@ Let me [know](/issues) how it worked for you!
 ```bash
 docker stop $(docker ps -a -q)
 ```
-- Stop Mage - switch to 2nd terminal and press `Ctrl-C`
-- Stop PostgreSQL - switch to 1st terminal and press `Ctrl-C`
+* Stop Mage AI 
+	- switch to 2nd terminal and press `Ctrl-C`
+	- then run `docker-compose down` in terminal
+* Stop PostgreSQL - switch to 1st terminal and press `Ctrl-C`
 
 ## Support
 
