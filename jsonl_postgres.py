@@ -95,7 +95,7 @@ def get_dtypes(table_name):
         # reviews file
         # Source file structure
         dtypes = {
-                'rating': 'float16', # Rating of the product (from 1.0 to 5.0).
+                'rating': 'float32', # Rating of the product (from 1.0 to 5.0).
                 'title': str, # Title of the user review.
                 'text': str, # Text body of the user review.
                 'images': object, # list, Images that users post after they have received the product. Each image has different sizes (small, medium, large), represented by the small_image_url, medium_image_url, and large_image_url respectively.
@@ -155,7 +155,7 @@ def main(params):
 
     i = 0
     # read_json is smart to process jsonl or autodetect .gz archived file by extension
-    chunks = pd.read_json(jsonl_name, lines=True, chunksize=10000, dtype=dtypes)
+    chunks = pd.read_json(jsonl_name, lines=True, chunksize=50000, dtype=dtypes)
     for chunk in chunks:
         i += 1
 
@@ -248,7 +248,7 @@ def main(params):
 
         # Exporting to PostgreSQL 
         try:
-            df.to_sql(name=table_name, con=engine, if_exists='append')
+            df.to_sql(name=table_name, con=engine, index=False, if_exists='append')
         except Exception as e:
             print('Appending chunk {i} to PostgreSQL table failed. Ingestion stopped.\n',e)
             print(df.head())
