@@ -55,7 +55,9 @@ Let's explore together! These categories (datasets) I played with so far.
 
 ## 🚀 Instructions to deploy
 
-🙈 Oh, so many steps?! Please don't panic, they are all simple enough, that's why so many. One step at a time. I did it, you can do it too! Let's go!
+🙈 Oh, so many steps?! Please take a deep breath to calm down, they are all simple enough, that's why so many. One step at a time. I did it successfully many times to test it, you can do it too! **Let's go!**
+
+NB: and if you 'lost the track', you can always start from scratch - create new CodeSpace and go step by step. Good luck!
 
 - [Setup environment](#hammer_and_wrench-setup-environment)
 - [Download dataset and start PostgreSQL server](#arrow_heading_down-download-dataset-and-start-postgresql-server)
@@ -224,7 +226,7 @@ In addition to using PostgreSQL in docker (local on your computer or as describe
 
 It provides a quite generous free plan (not a trial, no credit card required): 500 MB database space, 2 Core shared CPU, 1GB RAM, 5 GB bandwidth, 1 GB file storage. Free projects are paused after 1 week of inactivity. Limit of 2 active projects.
 
-I tested it, it works with my scripts. You just need to 
+I tested it, it works with my scripts, and with Metabase as well. You just need to: 
 - register free account 
 - get access credentials (host, port, user, password, database)
 - put new values to `.env` file 
