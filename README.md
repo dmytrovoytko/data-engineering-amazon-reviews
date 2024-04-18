@@ -46,6 +46,7 @@ Let's explore together! These categories (datasets) I played with so far.
 
 ## :toolbox: Tech stack
 
+- Docker and docker-compose
 - PostgreSQL as a data base/warehouse - open source and free
 - [Metabase](https://www.metabase.com/) as an analitics platform - open source and free self-hosted
 - [Mage AI](https://www.mage.ai/) as an orchestration tool - open source and free self-hosted
@@ -141,7 +142,7 @@ It will automatically download Metabase container and start it.
 
 ![Metabase app pop-up](/screenshots/metabase-app-pop-up.png)
 
-New page would probably open white. Please wait a couple of seconds to let it start, then refresh the page. Now you will see login screen. Just login with `john@mailinator.com`, pass: `Jj123456` (no worries, it's self-hosted, all safe). Your visualizations are already there for you! ✅🎉
+New page would probably open white. Please wait a couple of seconds to let it start, then refresh the page. Now you will see login screen. Just login with `john@mailinator.com`, pass: `Jj123456` (no worries, it's self-hosted, all safe). Pre-configured dashboard with reports is already there for you! ✅🎉
 
 💡 In case you accidentally close that pop-up or Metabase page and you need it later (after ingesting new datasets), you can always open that page from `Ports` tab:
 
