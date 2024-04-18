@@ -217,7 +217,7 @@ Enter `dataset_urls2.csv` (that you downloaded but not processed yet) and click 
 
 ## :stop_button: Instructions to stop the apps
 
-- Simple way - stop all together by stopping your CodeSpace. Remember, this will leave all downloaded data in your CodeSpace - you can start it later and continue playing with tools and data.
+- Simple way - stop all together by stopping your CodeSpace. Remember, this will leave all downloaded data in your CodeSpace - you can start it later and continue playing with tools and data. You can also delete CodeSpace with all the data.
 - Stop all active Docker containers - run this command in terminal
 ```bash
 docker stop $(docker ps -a -q)
