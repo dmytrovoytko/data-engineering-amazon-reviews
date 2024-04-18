@@ -202,7 +202,7 @@ You will see 2 pipelines I configured:
 
 ![Mage AI pipeline run variable](/screenshots/mage-run-pipeline-variable.png)
 
-Enter `dataset_urls2.csv` (that you downloaded but not processed yet) and click `Run now` button. Ingestion process started. You can see the progress on `Pipeline runs` page.
+Enter `dataset_urls2.csv` (that you downloaded but not processed yet) and click `Run now` button. Ingestion process started. You can see the progress on `Pipeline runs` page. It appears with a little delay, no worries.
 
 ![Mage AI pipeline run progress](/screenshots/mage-ai-pipeline-runs-running.png)
 
