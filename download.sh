@@ -77,7 +77,7 @@ while IFS=, read -r table archive url || [ -n "$table" ]; do
   if [[ "$archive" =~ .*\.jsonl.gz$ ]] && ! [[ -e "$DATA_DIRECTORY/$archive" ]]; then
     echo " Downloading $archive to '$DATA_DIRECTORY'..."
     # to log wget output add option: -a $DOWNLOAD_LOG
-    wget -O $DATA_DIRECTORY/$archive $url
+    wget -O $DATA_DIRECTORY/$archive --no-check-certificate $url
     if [[ $? -ne 0 ]]; then
       echo " Downloading $archive to '$DATA_DIRECTORY' failed. Exiting."
       exit 1; 
