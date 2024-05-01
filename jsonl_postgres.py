@@ -8,7 +8,8 @@ import pandas as pd
 
 from sqlalchemy import create_engine
 
-DEBUG=False # True
+CHUNKSIZE = 50_000
+DEBUG = False # True
 def verbose(df):
     if DEBUG:
         return df.head().to_string(index=False)
@@ -108,6 +109,89 @@ def get_dtypes(table_name):
                 }
     return dtypes
 
+def preprocess_meta(df, chunk):
+    # replacing rating_number = null with 0, then fixing wrong dtype (float because of nulls)
+    try:
+        df_repl = df[df['average_rating'].isnull()]
+        if df_repl.shape[0]:
+            print(f'Replacing null in average_rating -> 3: {df_repl.shape[0]} record(s)')
+            df.loc[chunk['average_rating'].isnull(), 'average_rating'] = 3
+        df_repl = df[df['rating_number'].isnull()]
+        if df_repl.shape[0]:
+            print(f'Replacing null in rating_number -> 0: {df_repl.shape[0]} record(s)')
+            df.loc[chunk['rating_number'].isnull(), 'rating_number'] = 0
+        # fixing wrong dtype    
+        df['rating_number'] = df['rating_number'].astype('int32')
+
+        # checks, no filtering, just warnings
+        df_repl = df[df['parent_asin'].astype(str).map(len)==0]
+        if df_repl.shape[0]:
+            print(f'! Empty parent_asin: {df_repl.shape[0]} record(s)\n{verbose(df_repl)}')
+
+        df_repl = df[df['title'].astype(str).map(len)==0]
+        if df_repl.shape[0]:
+            print(f'! Empty title: {df_repl.shape[0]} record(s)\n{verbose(df_repl)}')
+
+    except Exception as e:
+        print('Replacing null / fixing type error', e)
+        pass
+    return df
+
+def transform_meta(df, category_transformation):
+    # incorrect main_category - should be replaced (ex. Software) 
+    for replacement in category_transformation:
+        for category in category_transformation[replacement]:
+            df_repl = df[df['main_category']==category]
+            if df_repl.shape[0]:
+                print(f'Replacing incorrect main_category: {category} -> {replacement}, {df_repl.shape[0]} record(s)\n{verbose(df_repl)}')
+                df.loc[df['main_category']==category, 'main_category'] = replacement
+
+        # null 
+        # fill empty main_category
+        df_repl = df[df['main_category']=='None']
+        if df_repl.shape[0]:
+            print(f'Replacing null in main_category -> {replacement}: {df_repl.shape[0]} record(s)')
+            df.loc[df['main_category']=='None', 'main_category'] = replacement
+
+        # replacing rating_number = null with 0
+        try:
+            df_repl = df[df['rating_number'].isnull()]
+            if df_repl.shape[0]:
+                print(f'Replacing null in rating_number -> 0: {df_repl.shape[0]} record(s)')
+                df.loc[df['rating_number'].isnull(), 'rating_number'] = 0
+            df_repl = df[df['rating_number']<0]
+            if df_repl.shape[0]:
+                print(f'Replacing negative numbers in rating_number -> 0: {df_repl.shape[0]} record(s)')
+                df.loc[df['rating_number']<0, 'rating_number'] = 0
+        except Exception as e:
+            print('Replacing null in rating_number error', e)
+            pass
+
+    return df
+
+def check_file_name(source, table_name):
+    # this script works with plain or packed data files - .jsonl.gz / .jsonl
+    if not source.endswith('.jsonl') and not source.endswith('.jsonl.gz'):
+        print('Source file must be .jsonl or .jsonl.gz. Ingestion stopped.')
+        return ''
+
+    if not table_name in ['meta', 'reviews']:
+        print('Please check tablename, should it be "meta" or "reviews" Aborting.')
+        return ''
+
+    # extra check of filename and table_name consistency
+    file_name = Path(source).name # without full path
+    if file_name.startswith('meta_') and (not table_name=='meta'): 
+        # products file?
+        print('Please check tablename, should it be "meta"? Aborting.')
+        return ''
+    elif (not file_name.startswith('meta_')) and table_name=='meta': 
+        # reviews file?
+        print('Please check tablename, should it be "reviews"? Aborting.')
+        return ''
+
+    return file_name
+
 def main(params):
     user = params.user
     password = params.password
@@ -115,25 +199,12 @@ def main(params):
     port = params.port 
     db = params.db
     table_name = params.table_name
-    source = params.source
+    jsonl_name = params.source
     reset = params.reset
     
-    # this script works with plain or packed data files - .jsonl.gz / .jsonl
-    if not source.endswith('.jsonl') and not source.endswith('.jsonl.gz'):
-        print('Source file must be .jsonl or .jsonl.gz. Ingestion stopped.')
+    file_name = check_file_name(jsonl_name, table_name)
+    if file_name=='':
         return 1
-
-    # extra check of filename and table_name consistency
-    file_name = Path(source).name # without full path
-    if file_name.startswith('meta_') and (not table_name=='meta'): 
-        # products file?
-        print('Please check tablename, should it be "meta"? Aborting.')
-        return 1
-    elif (not file_name.startswith('meta_')) and table_name=='meta': 
-        # reviews file?
-        print('Please check tablename, should it be "reviews"? Aborting.')
-        return 1
-    jsonl_name = source
 
     print(f'\nConnecting to PostgreSQL: {host}:{port}/{db}...')
     try:
@@ -155,7 +226,7 @@ def main(params):
 
     i = 0
     # read_json is smart to process jsonl or autodetect .gz archived file by extension
-    chunks = pd.read_json(jsonl_name, lines=True, chunksize=50000, dtype=dtypes)
+    chunks = pd.read_json(jsonl_name, lines=True, chunksize=CHUNKSIZE, dtype=dtypes)
     for chunk in chunks:
         i += 1
 
@@ -169,86 +240,38 @@ def main(params):
 
         # PRE PROCESSING
         if table_name=='meta': # products file
-            # replacing rating_number = null with 0, then fixing wrong dtype (float because of nulls)
-            try:
-                df_repl = df[df['average_rating'].isnull()]
-                if df_repl.shape[0]:
-                    print(f'Replacing null in average_rating -> 3: {df_repl.shape[0]} record(s)')
-                    df.loc[chunk['average_rating'].isnull(), 'average_rating'] = 3
-                df_repl = df[df['rating_number'].isnull()]
-                if df_repl.shape[0]:
-                    print(f'Replacing null in rating_number -> 0: {df_repl.shape[0]} record(s)')
-                    df.loc[chunk['rating_number'].isnull(), 'rating_number'] = 0
-                # fixing wrong dtype    
-                df['rating_number'] = df['rating_number'].astype('int32')
+            df = preprocess_meta(df, chunk)
 
-                # checks, no filtering, just warnings
-                df_repl = df[df['parent_asin'].astype(str).map(len)==0]
-                if df_repl.shape[0]:
-                    print(f'! Empty parent_asin: {df_repl.shape[0]} record(s)\n{verbose(df_repl)}')
-
-                df_repl = df[df['title'].astype(str).map(len)==0]
-                if df_repl.shape[0]:
-                    print(f'! Empty title: {df_repl.shape[0]} record(s)\n{verbose(df_repl)}')
-
-            except Exception as e:
-                print('Replacing null / fixing type error', e)
-                pass
-
-        # checks ?
-        # duplicate parent_asin in meta
-        # check are there any not unique timestamps?
-        # how many duplicate titles?
+        # checks ? no serious reasons, performance is more important for now
+        # duplicate parent_asin in meta? - datasets are correct on this, and not critical
+        # check are there any not unique timestamps? - it's possible, and not critical 
+        # duplicate titles? - many are empty, some duplicate, not critical
 
         # transformation #1 reviews, !before [selected_columns]
-        # Renaming 'timestamp' column as it is a reserved keyword in many systems 
-        # - to prevent unexpected errors
-        df.columns = df.columns.str.replace('timestamp', 'review_date')
+        if table_name=='reviews':
+            # Renaming 'timestamp' column as it is a reserved keyword in many systems 
+            # - to prevent unexpected errors
+            df.columns = df.columns.str.replace('timestamp', 'review_date')
 
         # transformation #2
         # reducing data to the columns we need for project
         try:
             df = df[selected_columns]
         except Exception as e:
-            print(f'Reducing to {selected_columns} failed. Aborting.')
+            print(f'Reducing to {selected_columns} failed. Aborting.\n{e}')
             return 1
 
+        # transformation #3
+        # fixing null values, incorrect main_category
+        if table_name=='meta': # products file
+            df = transform_meta(df, category_transformation)
+
+        # replacing the table if it's the first chunk & reset param set 'true'
         if reset and i==1:
-            # replacing the table if it is the first chunk & param set
             if reset.lower()=='true':
                 res = reset_table(engine, table_name, df)
                 if res == False:
                     return 1
-
-        # transformation #3
-        # incorrect main_category - should be Software - replace
-        for replacement in category_transformation:
-            for category in category_transformation[replacement]:
-                df_repl = df[df['main_category']==category]
-                if df_repl.shape[0]:
-                    print(f'Replacing incorrect main_category: {category} -> {replacement}, {df_repl.shape[0]} record(s)\n{verbose(df_repl)}')
-                    df.loc[df['main_category']==category, 'main_category'] = replacement
-
-            # null 
-            # fill empty main_category
-            df_repl = df[df['main_category']=='None']
-            if df_repl.shape[0]:
-                print(f'Replacing null in main_category -> {replacement}: {df_repl.shape[0]} record(s)')
-                df.loc[df['main_category']=='None', 'main_category'] = replacement
-
-            # replacing rating_number = null with 0
-            try:
-                df_repl = df[df['rating_number'].isnull()]
-                if df_repl.shape[0]:
-                    print(f'Replacing null in rating_number -> 0: {df_repl.shape[0]} record(s)')
-                    df.loc[df['rating_number'].isnull(), 'rating_number'] = 0
-                df_repl = df[df['rating_number']<0]
-                if df_repl.shape[0]:
-                    print(f'Replacing negative numbers in rating_number -> 0: {df_repl.shape[0]} record(s)')
-                    df.loc[df['rating_number']<0, 'rating_number'] = 0
-            except Exception as e:
-                print('Replacing null in rating_number error', e)
-                pass
 
         # Exporting to PostgreSQL 
         try:
