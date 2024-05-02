@@ -249,6 +249,19 @@ docker stop $(docker ps -a -q)
 * Stop PostgreSQL - switch to 1st terminal and press `Ctrl-C`
 * You can delete downloaded dataset .jsonl.gz files from `/data` folder. 
 
+## Roadmap
+
+- [/] Refactor python code
+- [/] Load more data to analyze `Kindle Store` dataset
+- [/] Export to .parquet
+- [ ] Export to **BigQuery**
+- [ ] Visualize using **Apache Superset** (as an alternative to Metabase)
+- [ ] Visualize using **Looker Studio**
+- [ ] Orchestrate with **Prefect** (as an alternative to Mage)
+- [ ] Orchestrate with **Apache Airflow** (as an alternative to Mage)
+
+Stay tuned!
+
 ## Support
 
 🙏 Thank you for your attention and time!
