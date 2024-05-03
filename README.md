@@ -106,7 +106,7 @@ Dataset files have been downloaded, PostgreSQL is running - time to ingest your 
 ```bash
 bash process.sh
 ```
-It executes python script `jsonl_postgres.py` with default parameters from your `.env` settings. By default (without parameter) it processes 1st dataset files. As the result of successful loading you will see some progress messages and finally `Finished ingesting data/... into the PostgreSQL database! Total time ... second(s) +++ PROCESSING finished: OK!`. 
+It executes python script `process_jsonl.py` with default parameters from your `.env` settings. By default (without parameter) it processes the 1st dataset files. As the result of successful loading you will see some progress messages and finally `Finished ingesting data/... into the PostgreSQL database! Total time ... second(s) +++ PROCESSING finished: OK!`. 
 
 ![Processing successful](/screenshots/processing-successful.png)
 
@@ -166,7 +166,7 @@ You can see some [screenshots](/screenshots) below.
 
 ### :mage: Orchestrate data ingestion (Mage AI)
 
-I wouldn't say it was so simple and easy as Matt showed us in videos, but with some time and effort I managed to find the way to convert the logic of my `jsonl_postgres.py` script into `Mage` pipelines and bricks. Why is it worth my/your time? Because larger datasets (like Kindle_Store) will probably demand a serious cloud storage, database and compute than free CodeSpace playground. And I (you?) need to learn how to deal with them with a more scalable system, providing long job execution, partitioning, monitoring and logs. So let's see 2 pipelines I managed to setup with Mage. 
+I wouldn't say it was so simple and easy as Matt showed us in videos, but with some time and effort I managed to find the way to convert the logic of my `process_jsonl.py` script into `Mage` pipelines and bricks. Why is it worth my/your time? Because larger datasets (like Kindle_Store) will probably demand a serious cloud storage, database and compute than free CodeSpace playground. And I (you?) need to learn how to deal with them with a more scalable system, providing long job execution, partitioning, monitoring and logs. So let's see 2 pipelines I managed to setup with Mage. 
 
 💡 In case something goes wrong or complicated, you can still ingest more datasets with step 11 [Ingest data using CLI (bash & python)](#keyboard-ingest-data-using-cli-bash--python) and then reload Metabase dashboard page.
 
