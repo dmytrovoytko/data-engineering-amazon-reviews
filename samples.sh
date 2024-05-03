@@ -64,7 +64,7 @@ while IFS=, read -r table archive url || [ -n "$table" ]; do
   if [[ "$filename" =~ .*\.jsonl$ ]] && [[ -e "$DATA_DIRECTORY/$filename" ]]; then
     # unpacked file found - processing
     echo " Processing $DATA_DIRECTORY/$filename ..."
-    python $SCRIPT --user $POSTGRES_USER --password $POSTGRES_PASSWORD --host $POSTGRES_HOST --port $POSTGRES_PORT --db $POSTGRES_DBNAME --table_name $table --reset $RESET --source $DATA_DIRECTORY/$filename
+    python $SCRIPT --user $POSTGRES_USER --password $POSTGRES_PASSWORD --host $POSTGRES_HOST --port $POSTGRES_PORT --db $POSTGRES_DBNAME --table_name $table --reset $RESET --source $DATA_DIRECTORY/$filename --mode sample
     if [[ $? -ne 0 ]]; then
       # Aborted - stopping
       echo " Processing stopped."
@@ -75,21 +75,21 @@ while IFS=, read -r table archive url || [ -n "$table" ]; do
   fi 
    
   # unpacked file not found - checking archive
-  if [[ "$archive" =~ .*\.jsonl.gz$ ]] && [[ -e "$DATA_DIRECTORY/$archive" ]]; then
-    echo " Archive $DATA_DIRECTORY/$archive found. Testing..."
-    # should I check archive?
-    gzip -t $DATA_DIRECTORY/$archive
-  fi  
-  if [[ $? -ne 0 ]]; then
-    echo " Testing $DATA_DIRECTORY/$archive failed. Deleting to re-download. Processing stopped."
-    rm -rf $DATA_DIRECTORY/$archive
-    exit 1
-  fi  
+  # if [[ "$archive" =~ .*\.jsonl.gz$ ]] && [[ -e "$DATA_DIRECTORY/$archive" ]]; then
+  #   echo " Archive $DATA_DIRECTORY/$archive found. Testing..."
+  #   # should I check archive?
+  #   gzip -t $DATA_DIRECTORY/$archive
+  # fi  
+  # if [[ $? -ne 0 ]]; then
+  #   echo " Testing $DATA_DIRECTORY/$archive failed. Deleting to re-download. Processing stopped."
+  #   rm -rf $DATA_DIRECTORY/$archive
+  #   exit 1
+  # fi  
 
   # archive found - processing
   if [[ "$archive" =~ .*\.jsonl.gz$ ]] && [[ -e "$DATA_DIRECTORY/$archive" ]]; then
     echo " Processing $DATA_DIRECTORY/$archive ..."
-    python $SCRIPT --user $POSTGRES_USER --password $POSTGRES_PASSWORD --host $POSTGRES_HOST --port $POSTGRES_PORT --db $POSTGRES_DBNAME --table_name $table --reset $RESET --source $DATA_DIRECTORY/$archive
+    python $SCRIPT --user $POSTGRES_USER --password $POSTGRES_PASSWORD --host $POSTGRES_HOST --port $POSTGRES_PORT --db $POSTGRES_DBNAME --table_name $table --reset $RESET --source $DATA_DIRECTORY/$archive --mode sample
     if [[ $? -ne 0 ]]; then
       # Aborted - stopping
       echo " Processing stopped."

@@ -2,19 +2,57 @@ import os
 import argparse
 from pathlib import Path
 from time import time, strftime
-import json
 
 import pandas as pd
+# pd.set_option('display.max_columns', None)
 
 from sqlalchemy import create_engine
 
+# Processing mode
+PARQUET = 'parquet' # export to .parquet files
+POSTGRES = 'postgres' # load to PostgreSQL
+SAMPLE = 'sample' # export samples to .csv 
+
+# defaults
+SAMPLE_SIZE = 100
 CHUNKSIZE = 50_000
+MODE = POSTGRES # or PARQUET or SAMPLE
 DEBUG = False # True
+
 def verbose(df):
     if DEBUG:
         return df.head().to_string(index=False)
     else:
         return ''
+
+def check_file_name(source, table_name):
+    # this script works with plain or packed data files - .jsonl.gz / .jsonl
+    if not source.endswith('.jsonl') and not source.endswith('.jsonl.gz'):
+        print('Source file must be .jsonl or .jsonl.gz. Ingestion stopped.')
+        return ''
+
+    if not table_name in ['meta', 'books', 'reviews']:
+        print('Please check table_name, should it be "meta"/"books" or "reviews" Aborting.')
+        return ''
+
+    # extra check of filename and table_name consistency
+    file_name = Path(source).name # without full path
+    if file_name.startswith('meta_') and (not table_name in ['meta', 'books']): 
+        # products file?
+        print('Please check table_name, should it be "meta"/"books"? Aborting.')
+        return ''
+    elif (not file_name.startswith('meta_')) and (table_name in ['meta', 'books']): 
+        # reviews file?
+        print('Please check table_name, should it be "reviews"? Aborting.')
+        return ''
+
+    return file_name
+
+def check_params(mode, params):
+    if mode==POSTGRES and not (params.host and params.port and params.db and params.user and params.password):
+        print('Error: the following arguments are required for postgres ingestion: --host, --port, --db, --user, --password')
+        return False
+    return True
 
 def reset_table(engine, table_name, df):
     print(f'Table creation/reset {table_name}, columns: {df.columns.tolist()}\n{df.dtypes.to_string()}\n')
@@ -41,11 +79,17 @@ def get_category_transformation(table_name, file_name):
         elif 'Video_Games' in file_name:
             # Some products have incorrect main_category - should be replaced
             # ! Some products have empty main_category (null) - should be replaced
-            # oh. it's a mess there!
+            # TODO oh. it's a mess there!
             category_transformation = {'Video Games': 
                 ['Amazon Devices', 'Appliances', 'Audible Audiobooks', 'Baby', 'Car Electronics', 'Collectible Coins', 'Gift Cards', 'GPS & Navigation', 'Grocery', 'Handmade', '', 'None']}
         else:
             category_transformation = {}            
+    elif table_name=='books':
+        if 'Kindle_Store' in file_name:
+            # Some products have incorrect main_category - should be replaced 
+            # ! Some products have empty main_category (null) - should be replaced
+            category_transformation = {'Kindle Store': 
+                ['Buy a Kindle', 'Software', 'Magazine Subscriptions', '', 'None']}
     else: 
         # reviews file
         category_transformation = {}
@@ -55,6 +99,14 @@ def get_selected_columns(table_name):
     if table_name=='meta': 
         # products file
         selected_columns = ['parent_asin','title','main_category','average_rating','rating_number']
+        # , 'categories', 'details' ?
+        # , 'details' is temporary - removed after extracting key details
+    elif table_name=='books': 
+        # products file
+        selected_columns = ['parent_asin','title','main_category','average_rating','rating_number', 
+                            'categories', 
+                            'details', # 'details' is temporary - removed after extracting key details
+        ]
     else: 
         # reviews file
         selected_columns = ['parent_asin','verified_purchase', 'rating', 'helpful_vote', 'user_id', 
@@ -62,6 +114,12 @@ def get_selected_columns(table_name):
                             'review_date',
                             ]
     return selected_columns
+
+def get_extra_detail_columns(table_name):
+    if table_name=='books': 
+        return []
+    else:
+        return []
 
 def get_dtypes(table_name):
     # For be sure data file is structured as planned, and regulate pandas memory consumption
@@ -72,7 +130,7 @@ def get_dtypes(table_name):
         #     NumPy dtypes(as strings): 'int8', 'int16', 'int32', 'int64', 'float16', 'float32', 'float64', 'string_', 'category', 'datetime64[ns]'.       
         # Correct way: dtype={'column_name': 'Int64'}
 
-    if table_name=='meta': 
+    if table_name in ['meta', 'books']: 
         # products file
 
         # Source file structure
@@ -137,6 +195,9 @@ def preprocess_meta(df, chunk):
         pass
     return df
 
+def extract_kindle_meta(df, selected_details):
+    return df
+
 def transform_meta(df, category_transformation):
     # incorrect main_category - should be replaced (ex. Software) 
     for replacement in category_transformation:
@@ -169,64 +230,61 @@ def transform_meta(df, category_transformation):
 
     return df
 
-def check_file_name(source, table_name):
-    # this script works with plain or packed data files - .jsonl.gz / .jsonl
-    if not source.endswith('.jsonl') and not source.endswith('.jsonl.gz'):
-        print('Source file must be .jsonl or .jsonl.gz. Ingestion stopped.')
-        return ''
-
-    if not table_name in ['meta', 'reviews']:
-        print('Please check tablename, should it be "meta" or "reviews" Aborting.')
-        return ''
-
-    # extra check of filename and table_name consistency
-    file_name = Path(source).name # without full path
-    if file_name.startswith('meta_') and (not table_name=='meta'): 
-        # products file?
-        print('Please check tablename, should it be "meta"? Aborting.')
-        return ''
-    elif (not file_name.startswith('meta_')) and table_name=='meta': 
-        # reviews file?
-        print('Please check tablename, should it be "reviews"? Aborting.')
-        return ''
-
-    return file_name
+def export_data_to_parquet(df, file_name, file_name_list):
+    df.to_parquet(file_name, index=False)
+    file_name_list.append(file_name)
+    return file_name_list
 
 def main(params):
-    user = params.user
-    password = params.password
+    jsonl_name = params.source
+    table_name = params.table_name
+    mode = params.mode
     host = params.host 
     port = params.port 
     db = params.db
-    table_name = params.table_name
-    jsonl_name = params.source
+    user = params.user
+    password = params.password
     reset = params.reset
+    chunksize = params.chunksize
     
     file_name = check_file_name(jsonl_name, table_name)
     if file_name=='':
         return 1
 
-    print(f'\nConnecting to PostgreSQL: {host}:{port}/{db}...')
-    try:
-        engine = create_engine(f'postgresql://{user}:{password}@{host}:{port}/{db}')
-    except Exception as e:
-        print('PostgreSQL connection failed. Ingestion stopped.\n', e)
-        return 1
+    if not check_params(mode, params):
+        return 1 
+
+    if mode==POSTGRES:
+        print(f'\nConnecting to PostgreSQL: {host}:{port}/{db}...')
+        try:
+            engine = create_engine(f'postgresql://{user}:{password}@{host}:{port}/{db}')
+        except Exception as e:
+            print('PostgreSQL connection failed. Ingestion stopped.\n', e)
+            return 1
+    else:
+        print(f'Mode: {mode}')
 
     t_start = time()
     t_start0 = t_start
     print(f'[{strftime("%H:%M:%S")}] Loading {jsonl_name}')
 
-    # reducing memory consumption by setting explicit dtypes 
+    # for reducing memory consumption by setting explicit dtypes 
     dtypes = get_dtypes(table_name)
-    # reducing unnecessary data from original file to process selected columns only 
+    # for reducing unnecessary data from original file to process selected columns only 
     selected_columns = get_selected_columns(table_name)
+    # for extracting some data from 'details' column 
+    extra_columns = get_extra_detail_columns(table_name)
+    # final columns in desired order + correct ids
+    final_columns = selected_columns + [item.lower().replace(' ', '_') for item in extra_columns]
+    if table_name=='books': 
+        final_columns.remove('details')
     # for fixing incorrect main_category
     category_transformation = get_category_transformation(table_name, file_name)
 
     i = 0
+    export_list = []
     # read_json is smart to process jsonl or autodetect .gz archived file by extension
-    chunks = pd.read_json(jsonl_name, lines=True, chunksize=CHUNKSIZE, dtype=dtypes)
+    chunks = pd.read_json(jsonl_name, lines=True, chunksize=chunksize, dtype=dtypes)
     for chunk in chunks:
         i += 1
 
@@ -239,39 +297,71 @@ def main(params):
             return 1
 
         # PRE PROCESSING
-        if table_name=='meta': # products file
+        if table_name in ['meta', 'books']: # products file
             df = preprocess_meta(df, chunk)
+            # if table_name=='books':
+            #     # extracting key details for books
+            #     df = extract_kindle_meta(df, selected_columns)
 
         # checks ? no serious reasons, performance is more important for now
         # duplicate parent_asin in meta? - datasets are correct on this, and not critical
         # check are there any not unique timestamps? - it's possible, and not critical 
         # duplicate titles? - many are empty, some duplicate, not critical
 
-        # transformation #1 reviews, !before [selected_columns]
+        # transformation #1 reviews, (!) before reducing to [selected_columns]
         if table_name=='reviews':
             # Renaming 'timestamp' column as it is a reserved keyword in many systems 
             # - to prevent unexpected errors
             df.columns = df.columns.str.replace('timestamp', 'review_date')
 
-        # transformation #2
-        # reducing data to the columns we need for project
-        try:
-            df = df[selected_columns]
-        except Exception as e:
-            print(f'Reducing to {selected_columns} failed. Aborting.\n{e}')
-            return 1
+        if i==1 and mode==SAMPLE:
+            # export sample 0: before final transformation 
+            # print(df.head(5))
+            df[selected_columns].head(SAMPLE_SIZE).to_csv(jsonl_name+'_0.csv', encoding='utf-8', index=False)
 
-        # transformation #3
+        # transformation #2
         # fixing null values, incorrect main_category
         if table_name=='meta': # products file
             df = transform_meta(df, category_transformation)
+        elif table_name=='books': # products file
+            df = transform_meta(df, category_transformation)
+            # extracting key details for books
+            df = extract_kindle_meta(df, extra_columns)
 
-        # replacing the table if it's the first chunk & reset param set 'true'
-        if reset and i==1:
-            if reset.lower()=='true':
-                res = reset_table(engine, table_name, df)
-                if res == False:
-                    return 1
+        # transformation #3
+        # reducing data to the columns we need for project + reordering them for more convenient analysis
+        try:
+            # all_columns = df.columns.values.tolist()
+            # columns_to_drop = [item for item in all_columns if item not in selected_columns]
+            # df = df.drop(columns=columns_to_drop) # dropping creates copy - longer
+            df = df[final_columns]
+        except Exception as e:
+            print(f'Reducing to {final_columns} failed. Aborting.\n{e}')
+            return 1
+
+        # if table_name=='books': 
+        #     df = df.drop(columns='details')
+
+        if i==1 and mode==SAMPLE:
+            # export sample 1: after final transformation 
+            df.head(SAMPLE_SIZE).to_csv(jsonl_name+'_1.csv', encoding='utf-8', index=False)
+            # no full export - exiting
+            print(f'Finished exporting {jsonl_name} samples. Total time {(time() - t_start0):.3f} second(s)\n+++\n')
+            return 0
+
+        if mode == PARQUET:
+            export_data_to_parquet(df, f"{jsonl_name}-{i:02d}.parquet", export_list)
+            t_end = time()
+            print(f'... {jsonl_name}-{i:02d}.parquet, {df.shape[0]} record(s), took {(t_end - t_start):.3f} second(s)')
+            t_start = time()
+            continue
+
+        # mode == POSTGRES
+        # replacing the table if it's the first chunk & reset param set True
+        if i==1 and reset and reset.lower()=='true':
+            res = reset_table(engine, table_name, df)
+            if res == False:
+                return 1
 
         # Exporting to PostgreSQL 
         try:
@@ -281,23 +371,30 @@ def main(params):
             print(df.head())
             return 1
 
-        t_end = time()
-        print(f'... chunk {i:02d} appended, {df.shape[0]} record(s), took {(t_end - t_start):.3f} second(s)')
+        print(f'... chunk {i:02d} appended, {df.shape[0]} record(s), took {(time() - t_start):.3f} second(s)')
         t_start = time()
 
-    print(f'Finished ingesting {jsonl_name} into the PostgreSQL database! Total time {(t_end - t_start0):.3f} second(s)\n+++\n')
+    if mode == PARQUET:
+        # TODO saving export_list to file
+        print(f'Finished exporting {jsonl_name} to parquet files. Total time {(time() - t_start0):.3f} second(s)\n+++\n')
+    else:
+        print(f'Finished ingesting {jsonl_name} into the PostgreSQL database. Total time {(time() - t_start0):.3f} second(s)\n+++\n')
+
+    return 0
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Ingest jsonl data to Postgres')
+    parser = argparse.ArgumentParser(description='Ingest jsonl data to Postgres or export sample/parquet') # TODO Process?
 
-    parser.add_argument('--user', required=True, help='user name for postgres')
-    parser.add_argument('--password', required=True, help='password for postgres')
-    parser.add_argument('--host', required=True, help='host for postgres')
-    parser.add_argument('--port', required=True, help='port for postgres')
-    parser.add_argument('--db', required=True, help='database name for postgres')
-    parser.add_argument('--table_name', required=True, help='name of the table where we will write the results to')
-    parser.add_argument('--source', required=True, help='source jsonl file to load')
-    parser.add_argument('--reset', required=False, help='True to reset table before loading')
+    parser.add_argument('--source', required=True, help='source jsonl[.gz] file to process')
+    parser.add_argument('--table_name', required=True, help='name of the table to load data')
+    parser.add_argument('--mode', required=False, type=str, default=POSTGRES, help=f'{POSTGRES}/{SAMPLE}/{PARQUET}, {POSTGRES} as default')
+    parser.add_argument('--host', required=False, help='host for postgres')
+    parser.add_argument('--port', required=False, help='port for postgres')
+    parser.add_argument('--db', required=False, help='database name for postgres')
+    parser.add_argument('--user', required=False, help='user name for postgres')
+    parser.add_argument('--password', required=False, help='password for postgres')
+    parser.add_argument('--reset', required=False, type=str, default='False', help='True to reset table before loading, False as default')
+    parser.add_argument('--chunksize', required=False, type=int, default=CHUNKSIZE, help=f'processing chunk size, {CHUNKSIZE} as default')
 
     args = parser.parse_args()
 
