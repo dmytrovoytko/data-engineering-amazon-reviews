@@ -26,7 +26,7 @@ Some time ago I became very interested in how much we can trust all those rating
 - **Reviews**: user's ratings, review dates, was that verified purchase or not 
   (will analyze reviews texts later, awesome source for many insights I think)
 
-Thanks to ZoomCamp for the reason to learn many new tools and get back to my 'reviews & trust' questions!  
+Thanks to ZoomCamp for the reason to learn many new tools and get back to my 'reviews & trust' questions!
 
 ### 🕵️ Questions that I chose to investigate during this project:
 
@@ -41,7 +41,7 @@ Let's explore together! These categories (datasets) I played with so far.
 
 ## ℹ️ Assets
 
-- dataset urls are defined in .csv files stored in `/data` directory - `dataset_urls0.csv`, `dataset_urls1.csv`, etc
+- dataset urls are defined in .csv files stored in `/data` - `dataset_urls0.csv`, `dataset_urls1.csv`, etc
 - my scripts (bash, python, sql)
 - pre-configured Metabase dashboard
 - pre-configured Mage AI pipelines 
@@ -253,10 +253,11 @@ docker stop $(docker ps -a -q)
 
 ## Roadmap
 
-- [/] Refactor python code
+- [x] Refactor python code
+- [x] Export to .parquet
+- [x] Export to **BigQuery**
+- [/] **BigQuery**: update Mage orchestration, visualization and instructions 
 - [/] Load more data to analyze `Kindle Store` dataset
-- [/] Export to .parquet
-- [ ] Export to **BigQuery**
 - [ ] Visualize using **Apache Superset** (as an alternative to Metabase)
 - [ ] Visualize using **Looker Studio**
 - [ ] Orchestrate with **Prefect** (as an alternative to Mage)
