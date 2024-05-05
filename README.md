@@ -1,10 +1,12 @@
 # Data Engineering project Amazon Reviews
 
-Data Engineering project for ZoomCamp`24: JSONL -> PostgreSQL + Metabase + Mage.AI
+Data Engineering project for ZoomCamp`24: JSONL -> PostgreSQL/BigQuery + Metabase + Mage.AI
 
 ETL for [Amazon Reviews'23` dataset](https://amazon-reviews-2023.github.io/).
 
-![Data Engineering project Amazon Reviews](/screenshots/amazon-reviews-data-engineering.png)
+![Data Engineering project Amazon Reviews](/screenshots/amazon-reviews-data-engineering-2.png)
+
+New branch with export to BigQuery (in progress, export works only in bash scripts, no Mage yet, stay tuned!)
 
 Cloud environment: **GitHub CodeSpaces**, free and enough to test (120 core-hours of Codespaces compute for free monthly, 15GB of Codespaces storage for free monthly). 
 
@@ -24,7 +26,7 @@ Some time ago I became very interested in how much we can trust all those rating
 - **Reviews**: user's ratings, review dates, was that verified purchase or not 
   (will analyze reviews texts later, awesome source for many insights I think)
 
-Thanks to ZoomCamp for the reason to learn many new tools and get back to my 'reviews & trust' questions!  
+Thanks to ZoomCamp for the reason to learn many new tools and get back to my 'reviews & trust' questions! 
 
 ### 🕵️ Questions that I chose to investigate during this project:
 
@@ -48,6 +50,7 @@ Let's explore together! These categories (datasets) I played with so far.
 
 - Docker and docker-compose. All dockerized apps use default bridge network (172.17.0.x). 
 - PostgreSQL as a data base/warehouse - open source and free
+- 🆕 Google **BigQuery** as a data base/warehouse - available free trial 
 - [Metabase](https://www.metabase.com/) as an analitics platform - open source and free self-hosted
 - [Mage AI](https://www.mage.ai/) as an orchestration tool - open source and free self-hosted
 
@@ -251,10 +254,11 @@ docker stop $(docker ps -a -q)
 
 ## Roadmap
 
-- [/] Refactor python code
+- [x] Refactor python code
+- [x] Export to .parquet
+- [x] Export to **BigQuery**
+- [/] **BigQuery**: update Mage orchestration, visualization and instructions 
 - [/] Load more data to analyze `Kindle Store` dataset
-- [/] Export to .parquet
-- [ ] Export to **BigQuery**
 - [ ] Visualize using **Apache Superset** (as an alternative to Metabase)
 - [ ] Visualize using **Looker Studio**
 - [ ] Orchestrate with **Prefect** (as an alternative to Mage)
