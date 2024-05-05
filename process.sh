@@ -17,6 +17,7 @@ fi
 DATA_DIRECTORY='data'
 SCRIPT='process_jsonl.py'
 RESET='false'
+MODE='parquet'
 
 POSTGRES_DBNAME=
 POSTGRES_USER=
@@ -40,7 +41,7 @@ else
     exit 1
 fi
 
-echo "PROCESSING: transforming & loading dataset files from '$DATASET_URLS' to PostgreSQL'..."
+echo "PROCESSING: transforming & loading dataset files from '$DATASET_URLS' -> $MODE..."
 
 # Preparing data directory
 if [ ! -d "$DATA_DIRECTORY" ]; then
@@ -64,7 +65,7 @@ while IFS=, read -r table archive url || [ -n "$table" ]; do
   if [[ "$filename" =~ .*\.jsonl$ ]] && [[ -e "$DATA_DIRECTORY/$filename" ]]; then
     # unpacked file found - processing
     echo " Processing $DATA_DIRECTORY/$filename ..."
-    python $SCRIPT --user $POSTGRES_USER --password $POSTGRES_PASSWORD --host $POSTGRES_HOST --port $POSTGRES_PORT --db $POSTGRES_DBNAME --table_name $table --reset $RESET --source $DATA_DIRECTORY/$filename
+    python $SCRIPT --user $POSTGRES_USER --password $POSTGRES_PASSWORD --host $POSTGRES_HOST --port $POSTGRES_PORT --db $POSTGRES_DBNAME --table_name $table --reset $RESET --source $DATA_DIRECTORY/$filename --mode $MODE
     if [[ $? -ne 0 ]]; then
       # Aborted - stopping
       echo " Processing stopped."
@@ -89,7 +90,7 @@ while IFS=, read -r table archive url || [ -n "$table" ]; do
   # archive found - processing
   if [[ "$archive" =~ .*\.jsonl.gz$ ]] && [[ -e "$DATA_DIRECTORY/$archive" ]]; then
     echo " Processing $DATA_DIRECTORY/$archive ..."
-    python $SCRIPT --user $POSTGRES_USER --password $POSTGRES_PASSWORD --host $POSTGRES_HOST --port $POSTGRES_PORT --db $POSTGRES_DBNAME --table_name $table --reset $RESET --source $DATA_DIRECTORY/$archive
+    python $SCRIPT --user $POSTGRES_USER --password $POSTGRES_PASSWORD --host $POSTGRES_HOST --port $POSTGRES_PORT --db $POSTGRES_DBNAME --table_name $table --reset $RESET --source $DATA_DIRECTORY/$archive --mode $MODE
     if [[ $? -ne 0 ]]; then
       # Aborted - stopping
       echo " Processing stopped."
