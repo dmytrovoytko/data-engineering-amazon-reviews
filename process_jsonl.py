@@ -8,6 +8,8 @@ import pandas as pd
 
 from sqlalchemy import create_engine
 
+from export_bigquery import export_parquet_to_bigquery
+
 # Processing mode
 PARQUET = 'parquet' # export to .parquet files
 POSTGRES = 'postgres' # load to PostgreSQL
@@ -99,14 +101,9 @@ def get_selected_columns(table_name):
     if table_name=='meta': 
         # products file
         selected_columns = ['parent_asin','title','main_category','average_rating','rating_number']
-        # , 'categories', 'details' ?
-        # , 'details' is temporary - removed after extracting key details
     elif table_name=='books': 
         # products file
-        selected_columns = ['parent_asin','title','main_category','average_rating','rating_number', 
-                            'categories', 
-                            'details', # 'details' is temporary - removed after extracting key details
-        ]
+        selected_columns = ['parent_asin','title','main_category','average_rating','rating_number']
     else: 
         # reviews file
         selected_columns = ['parent_asin','verified_purchase', 'rating', 'helpful_vote', 'user_id', 
@@ -115,11 +112,8 @@ def get_selected_columns(table_name):
                             ]
     return selected_columns
 
-def get_extra_detail_columns(table_name):
-    if table_name=='books': 
-        return []
-    else:
-        return []
+def get_extra_detail_columns(table_name, file_name):
+    return {}
 
 def get_dtypes(table_name):
     # For be sure data file is structured as planned, and regulate pandas memory consumption
@@ -195,9 +189,6 @@ def preprocess_meta(df, chunk):
         pass
     return df
 
-def extract_kindle_meta(df, selected_details):
-    return df
-
 def transform_meta(df, category_transformation):
     # incorrect main_category - should be replaced (ex. Software) 
     for replacement in category_transformation:
@@ -230,8 +221,11 @@ def transform_meta(df, category_transformation):
 
     return df
 
+def extract_kindle_meta(df, selected_details):
+    return df
+
 def export_data_to_parquet(df, file_name, file_name_list):
-    df.to_parquet(file_name, index=False)
+    df.to_parquet(file_name, index=False, engine='pyarrow')
     file_name_list.append(file_name)
     return file_name_list
 
@@ -262,20 +256,21 @@ def main(params):
             print('PostgreSQL connection failed. Ingestion stopped.\n', e)
             return 1
     else:
-        print(f'Mode: {mode}')
+        print(f' Mode: {mode}')
 
     t_start = time()
     t_start0 = t_start
-    print(f'[{strftime("%H:%M:%S")}] Loading {jsonl_name}')
+    print(f'\n[{strftime("%H:%M:%S")}] Loading {jsonl_name}')
 
     # for reducing memory consumption by setting explicit dtypes 
     dtypes = get_dtypes(table_name)
     # for reducing unnecessary data from original file to process selected columns only 
     selected_columns = get_selected_columns(table_name)
     # for extracting some data from 'details' column 
-    extra_columns = get_extra_detail_columns(table_name)
+    extra_columns = get_extra_detail_columns(table_name, file_name)
     # final columns in desired order + correct ids
-    final_columns = selected_columns + [item.lower().replace(' ', '_') for item in extra_columns]
+    # final_columns = selected_columns + [item.lower().replace(' ', '_') for item in extra_columns]
+    final_columns = selected_columns + [val for key,val in extra_columns.items()]
     if table_name=='books': 
         final_columns.remove('details')
     # for fixing incorrect main_category
@@ -313,20 +308,22 @@ def main(params):
             # Renaming 'timestamp' column as it is a reserved keyword in many systems 
             # - to prevent unexpected errors
             df.columns = df.columns.str.replace('timestamp', 'review_date')
+            df['review_date'] = df['review_date'].astype('datetime64[s]')
 
         if i==1 and mode==SAMPLE:
             # export sample 0: before final transformation 
             # print(df.head(5))
-            df[selected_columns].head(SAMPLE_SIZE).to_csv(jsonl_name+'_0.csv', encoding='utf-8', index=False)
+            df.head(SAMPLE_SIZE).to_csv(jsonl_name+'_0.csv', encoding='utf-8', index=False)
 
         # transformation #2
         # fixing null values, incorrect main_category
         if table_name=='meta': # products file
             df = transform_meta(df, category_transformation)
         elif table_name=='books': # products file
-            df = transform_meta(df, category_transformation)
             # extracting key details for books
             df = extract_kindle_meta(df, extra_columns)
+            df = transform_meta(df, category_transformation)
+            df = rename_columns(df)
 
         # transformation #3
         # reducing data to the columns we need for project + reordering them for more convenient analysis
@@ -346,13 +343,12 @@ def main(params):
             # export sample 1: after final transformation 
             df.head(SAMPLE_SIZE).to_csv(jsonl_name+'_1.csv', encoding='utf-8', index=False)
             # no full export - exiting
-            print(f'Finished exporting {jsonl_name} samples. Total time {(time() - t_start0):.3f} second(s)\n+++\n')
+            print(f'Finished exporting {jsonl_name} -> samples. Total time {(time() - t_start0):.3f} second(s)\n+++\n')
             return 0
 
         if mode == PARQUET:
-            export_data_to_parquet(df, f"{jsonl_name}-{i:02d}.parquet", export_list)
-            t_end = time()
-            print(f'... {jsonl_name}-{i:02d}.parquet, {df.shape[0]} record(s), took {(t_end - t_start):.3f} second(s)')
+            export_data_to_parquet(df, f'{jsonl_name}-{i:02d}.parquet', export_list)
+            print(f'... {jsonl_name}-{i:02d}.parquet, {df.shape[0]} record(s), took {(time() - t_start):.3f} second(s)')
             t_start = time()
             continue
 
@@ -375,8 +371,10 @@ def main(params):
         t_start = time()
 
     if mode == PARQUET:
-        # TODO saving export_list to file
+        # TODO ? saving export_list to file
         print(f'Finished exporting {jsonl_name} to parquet files. Total time {(time() - t_start0):.3f} second(s)\n+++\n')
+        export_parquet_to_bigquery(table_name, export_list, file_name)
+        print(f'Finished ingesting {jsonl_name} into BigQuery. Total time {(time() - t_start0):.3f} second(s)\n+++\n')
     else:
         print(f'Finished ingesting {jsonl_name} into the PostgreSQL database. Total time {(time() - t_start0):.3f} second(s)\n+++\n')
 

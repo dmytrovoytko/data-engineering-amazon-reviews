@@ -1,5 +1,21 @@
 pandas==2.2.1
+
+# for PostgreSQL
 pgcli==4.0.1
 SQLAlchemy==2.0.28
 psycopg2-binary==2.9.9
+
+# for Mage AI
 dask[complete]
+
+# for loading environment variables
+python-dotenv==1.0.1
+
+# for parquet export/import
+pyarrow==16.0.0
+db-dtypes==1.2.0
+
+# for BigQuery
+google-cloud==0.34.0
+google-cloud-bigquery==3.21.0
+google-cloud-core==2.4.1
