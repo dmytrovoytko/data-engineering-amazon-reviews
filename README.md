@@ -6,6 +6,8 @@ ETL for [Amazon Reviews'23` dataset](https://amazon-reviews-2023.github.io/).
 
 ![Data Engineering project Amazon Reviews](/screenshots/amazon-reviews-data-engineering.png)
 
+‼️New [branch](https://github.com/dmytrovoytko/data-engineering-amazon-reviews/tree/feature/ingest-bigquery) with export to BigQuery (in progress, export works only via scripts, no Mage yet, stay tuned!)
+
 Cloud environment: **GitHub CodeSpaces**, free and enough to test (120 core-hours of Codespaces compute for free monthly, 15GB of Codespaces storage for free monthly). 
 
 To reproduce and review this project it would be enough (hopefully) less than hour, and ~8GB total for described datasets. You don't need to use anything extra, like VS Code or trial accounts - just webrowser + GitHub account is totally enough.
