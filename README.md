@@ -6,7 +6,7 @@ ETL for [Amazon Reviews'23` dataset](https://amazon-reviews-2023.github.io/).
 
 ![Data Engineering project Amazon Reviews](/screenshots/amazon-reviews-data-engineering-2.png)
 
-New branch with export to BigQuery (in progress, export works only in bash scripts, no Mage yet, stay tuned!)
+‼️New branch with export to BigQuery (in progress, export works only via scripts, no Mage yet, stay tuned!)
 
 Cloud environment: **GitHub CodeSpaces**, free and enough to test (120 core-hours of Codespaces compute for free monthly, 15GB of Codespaces storage for free monthly). 
 
@@ -41,7 +41,7 @@ Let's explore together! These categories (datasets) I played with so far.
 
 ## ℹ️ Assets
 
-- dataset urls are defined in .csv files stored in `/data` directory - `dataset_urls0.csv`, `dataset_urls1.csv`, etc
+- dataset urls are defined in .csv files stored in `/data` - `dataset_urls0.csv`, `dataset_urls1.csv`, etc
 - my scripts (bash, python, sql)
 - pre-configured Metabase dashboard
 - pre-configured Mage AI pipelines 
